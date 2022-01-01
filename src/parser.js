@@ -13,15 +13,15 @@ const parser = yargs
         type: "string",
         desc: "algorithm 'ln' (letter-number) or 'll' (letter-letter)"
     })
-    .option('encode', {
+    .option('encrypt', {
         alias: 'e',
         type: "string",
-        desc: "encode the target file"
+        desc: "encrypt the target file"
     })
-    .option('decode', {
+    .option('decrypt', {
         alias: 'd',
         type: "string",
-        desc: "decode the target file"
+        desc: "decrypt the target file"
     })
     .option('key', {
         alias: 'k',
@@ -29,9 +29,9 @@ const parser = yargs
         desc: "a number to offset letter-number encoding"
     })
     .check((argv) => {
-        const { encode, decode } = argv;
-        if (!encode && !decode) {
-            throw new Error("An argument must be provided for either --encode or --decode.");
+        const { encrypt, decrypt } = argv;
+        if (!encrypt && !decrypt) {
+            throw new Error("An argument must be provided for either --encrypt or --decrypt.");
         }
         return true;
     })

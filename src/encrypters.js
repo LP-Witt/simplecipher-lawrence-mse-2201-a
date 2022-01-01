@@ -8,7 +8,7 @@ class EncrypterBase {
     static parseCharSet(charSet, charValidator, valValidator) {
         const charRows = charSet.split("\n");
 
-        if (charRows[0] !== "character, value") {
+        if (charRows[0].trim() !== "character, value") {
             throw new Error('Character set is missing header "character, value".')
         }
         
@@ -47,7 +47,7 @@ class LetterNumber extends EncrypterBase {
         )
     }
 
-    encrypt(str, offset) {
+    encrypt(str, offset = 0) {
         return str.split("").reduce((acc, curr) => {
             const val = this.charDict.byChar[curr];
             if (!val) return acc;
@@ -57,7 +57,7 @@ class LetterNumber extends EncrypterBase {
         }, "");
     }
 
-    decrypt(str, offset) {
+    decrypt(str, offset = 0) {
         let out = "";
 
         for (let i=2; i<=str.length; i+=2) {
