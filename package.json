@@ -1,0 +1,11 @@
+{
+  "name": "simplecipher-lawrence-mse-2201-a",
+  "version": "1.0.0",
+  "description": "A simple encryption tool.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lawrence Witt",
+  "license": "MIT"
+}
