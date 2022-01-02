@@ -4,7 +4,8 @@
   "description": "A simple encryption tool.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest --runInBand",
+    "prepublishOnly": "npm run test"
   },
   "bin": {
     "simple-cipher": "./index.js"
