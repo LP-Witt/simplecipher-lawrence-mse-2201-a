@@ -1,4 +1,9 @@
-const { validateStringIsNumber, validateLengthOf } = require("./validators");
+const {
+  isDefined,
+  validateStringIsNumber,
+  validateLengthOf,
+  validateIsNotAssigned,
+} = require("./validators");
 
 class EncrypterBase {
   constructor(charSet, charValidator, valValidator) {
@@ -16,15 +21,17 @@ class EncrypterBase {
       (acc, curr) => {
         const pairSplit = curr.split(", ");
 
-        if (pairSplit.length !== 2) {
+        if (pairSplit.length !== 2)
           throw new Error(`Could not derive character/value pair from "${curr}".`);
-        }
 
         const char = pairSplit[0];
         const val = pairSplit[1].replace("\r", "");
 
         if (typeof charValidator === "function") charValidator(char);
         if (typeof valValidator === "function") valValidator(val);
+
+        validateIsNotAssigned(char, acc.byChar, "character", "value");
+        validateIsNotAssigned(val, acc.byVal, "value", "character");
 
         acc.byChar[char] = val;
         acc.byVal[val] = char;
@@ -34,11 +41,20 @@ class EncrypterBase {
       { byChar: {}, byVal: {} },
     );
 
-    if (Object.keys(charDict.byChar).length !== Object.keys(charDict.byVal).length) {
-      throw new Error(`Character and value keys are mismatched. Check for duplicates.`);
-    }
-
     return charDict;
+  }
+
+  validateProperty(type, prop) {
+    const result = {
+      character: this.charDict.byChar[prop],
+      value: this.charDict.byVal[prop],
+    }[type];
+
+    if (!isDefined(result)) {
+      throw new Error(
+        `The ${type} "${prop}" does not exist in the provided character set.`,
+      );
+    }
   }
 }
 
@@ -53,8 +69,8 @@ class LetterNumber extends EncrypterBase {
 
   encrypt(str, offset = 0) {
     return str.split("").reduce((acc, curr) => {
+      this.validateProperty("character", curr);
       const val = this.charDict.byChar[curr];
-      if (!val) return acc;
       const encoded = ((v) => (v > 99 ? v % 100 : v))(parseInt(val) + offset);
       const minTwo = encoded < 10 ? `0${encoded}` : `${encoded}`;
       return acc + minTwo;
@@ -69,7 +85,8 @@ class LetterNumber extends EncrypterBase {
       const decoded = ((v) => (v > 99 ? `${v % 100}` : `${v}`))(
         100 - ((offset - encoded) % 100),
       );
-      out += this.charDict.byVal[decoded] || "";
+      this.validateProperty("value", decoded);
+      out += this.charDict.byVal[decoded];
     }
 
     return out;
@@ -86,16 +103,18 @@ class LetterLetter extends EncrypterBase {
   }
 
   encrypt(str) {
-    return str
-      .split("")
-      .reduce((acc, curr) => acc + (this.charDict.byChar[curr] || ""), "");
+    return str.split("").reduce((acc, curr) => {
+      this.validateProperty("character", curr);
+      return acc + this.charDict.byChar[curr];
+    }, "");
   }
 
   decrypt(str) {
-    return str
-      .split("")
-      .reduce((acc, curr) => acc + (this.charDict.byVal[curr] || ""), "");
+    return str.split("").reduce((acc, curr) => {
+      this.validateProperty("value", curr);
+      return acc + this.charDict.byVal[curr];
+    }, "");
   }
 }
 
-module.exports = { LetterNumber, LetterLetter };
+module.exports = { EncrypterBase, LetterNumber, LetterLetter };
