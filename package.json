@@ -11,6 +11,10 @@
   },
   "author": "Lawrence Witt",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LP-Witt/simplecipher-lawrence-mse-2201-a"
+  },
   "dependencies": {
     "yargs": "^17.3.1"
   },
